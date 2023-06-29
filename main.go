@@ -93,16 +93,13 @@ func readChunks(filename string, chunkSize int) ([]byte, error) {
 }
 
 func (encoder *HuffmanRoot) Encode(data []byte) ([]byte, error) {
-	fmt.Println("generateHuffmanCodes")
 	codes := generateHuffmanCodes(encoder.root)
-	fmt.Println("compressData")
 	compressed := compressData(data, codes)
 	return compressed, nil
 }
 
 func compressData(data []byte, codes map[byte]string) []byte {
 	var buffer bytes.Buffer
-	fmt.Println("write string codec")
 	for _, b := range data {
 		_, err := buffer.WriteString(codes[b])
 		if err != nil {
@@ -110,7 +107,6 @@ func compressData(data []byte, codes map[byte]string) []byte {
 		}
 	}
 
-	fmt.Println("string to byte")
 	ham := StringToByteArray(buffer.String())
 	return ham
 }
@@ -203,15 +199,12 @@ func buildHuffmanCodes(node *HuffmanNode, code string, codes map[byte]string) {
 func EncodeLoop(data []byte, i *int8) ([]byte, error) {
 	var binBuffer bytes.Buffer
 	encoder := &HuffmanRoot{}
-	fmt.Println("Creating Tree")
 	encoder.BuildTree(data)
-	fmt.Println("Encoding")
 	compressed, err := encoder.Encode(data)
 	if err != nil {
 		return compressed, err
 	}
 
-	fmt.Println("SerializeTree")
 	treeData, err := encoder.SerializeTree()
 	if err != nil {
 		return compressed, err
@@ -223,21 +216,15 @@ func EncodeLoop(data []byte, i *int8) ([]byte, error) {
 		CompressAmount: *i,
 	}
 
-	fmt.Println("Write to binary 1/3")
-
 	err = binary.Write(&binBuffer, binary.LittleEndian, header)
 	if err != nil {
 		return compressed, err
 	}
 
-	fmt.Println("Write to binary 2/3")
-
 	err = binary.Write(&binBuffer, binary.LittleEndian, treeData)
 	if err != nil {
 		return compressed, err
 	}
-
-	fmt.Println("Write to binary 3/3")
 
 	err = binary.Write(&binBuffer, binary.LittleEndian, compressed)
 	if err != nil {
